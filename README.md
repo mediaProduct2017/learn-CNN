@@ -11,3 +11,9 @@ Convolutional neural network (CNN)的优势在于可以抓住不同feature之间
 对于自然语言处理，扫描时一般只做横向扫描，也就是说，word vector不再做切割扫描，最简单的扫描方式是，2个word（或2个字）扫描一次，每次移动1个word（或1个字），逐次扫描过去。得到新的一层neuron后，再按同样的方法扫描过去。
 
 可以认为，CNN是一种实用的Tree recursive neural network，包含着specific assumption。
+
+Refercences:
+
+[Deep learning and convolutional neural network](http://neuralnetworksanddeeplearning.com/chap6.html)
+
+[Generative Adversarial Networks](https://channel9.msdn.com/Events/Neural-Information-Processing-Systems-Conference/Neural-Information-Processing-Systems-Conference-NIPS-2016/Generative-Adversarial-Networks)
