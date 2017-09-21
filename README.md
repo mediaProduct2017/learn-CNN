@@ -10,6 +10,74 @@ Convolutional neural network (CNN)的优势在于可以抓住不同feature之间
 
 可以认为，CNN是一种实用的Tree recursive neural network，包含着specific assumption。
 
+对于大的data set，往往分批装入内存，然后用程序语言来处理。在cost function优化过程中，之所以用mini-batch的方法，也是因为内存不够，如果还用full-batch，在每一轮优化的过程中，都要不断把新的数据加载到内存中，覆盖掉之前的内存中的数据，在下一轮中，又要循环加载被覆盖掉的数据，这样的话，计算的效率太低。同时要注意的是，分批的时候一定要随机化，否则的话，如果某一批都是某个类别的话，针对该批的mini-batch training就没有太大的意义。
+
+Explore data包括展示data某一维的histogram分布，或者是不同维度之间的相关关系（用散点图就能简单的展示）。必要的话，还可以针对不同种类样本画出各个维度的box plot，或者通过PCA进行低维的可视化。
+
+Data normalization包括必要的话取对数并做outlier detection，以及减去均值除以标准差的归一化处理。归一化处理时有可能是以0为均值、以1为标准差的normal，也有可能是truncated normal，同样是以0位均值、以1为标准差，但是2以外的数值就不要了（其实常见于weights的初始化）。如果原始数据就都是正值，也有可能简单除以数据的最大值，或者除以数据可能的最大值，或者除以范围（数据的最大值-最小值）。Data normalization还包括one-hot encode for target variable.
+
+在数据分析的noetbook中，经常设置check point，比如保存好数据后，下一个cell可以设置check point，简单的重新载入数据，如果重新启动可以从这一个cell开始。
+
+Note: None for shapes in TensorFlow allow for a dynamic size. 也即是说，在TF placeholder中，None在具体传参的时候可以是任意值。
+
+What's the difference between tf.placeholder and tf.Variable (stack overflow)?
+
+In short, you use tf.Variable for trainable variables such as weights and biases for your model. tf.placeholder is used to feed actual training examples. Your tf.Variable will be trained (modified) during training.
+
+## Convolution and max pooling layer
+
+对于图片，input是三维的，第三维是RGB三个图层，filter是三维的，这三维对应图片的三个维度，第三个维度一般取3，也就是说，在RGB图层维度上，是不做切割的。三维的filter与四维的weights是对应的，weights的第四维是convolution layer的深度。filter strides也是四维的。In TensorFlow, strides is an array of 4 elements; the first element in this array indicates the stride for batch and last element indicates stride for features（也就是RGB三个图层）. It's good practice to remove the batches or features you want to skip from the data set rather than use a stride to skip them. You can always set the first and last element to 1 in strides in order to use all batches and features.
+
+从input到convolution layer，和普通的neural net的input到hidden layer有神似，普通的neural net的input是把二维或者三维的图片展成一个大的向量，这里，input是把filter的三维input展成一个大的向量，然后通过线性变换对应到convolution layer上，对于一个filter，convolution layer是一个向量，大小是convolution layer的深度，其实相当于普通的neural net的hidden layer，convolution layer的深度就对应着hidden layer的node number.
+
+convolution layer从深度的一维到三维的过程，不过是filter在横纵两个维度上依次扫描罢了。在实际的应用中，convolution layer常常输出一个四维的tensor，第一维是batch size，就是用来训练的有多少个batch，接下来的三个维度依次是横纵和深度。
+
+max pooling是一个降低模型复杂度，减少参数的过程，pooling的ksize一般也是四维，第一维batch pooling一般选1，第四维feature pooling一般也选1，只在横纵两个维度上做max pooling。pooling的strides的大小一般和pooling的大小是一致的。
+
+Convolution and max pooling layer有可能不只一个，有可能有多个，layer的深度在不断发生变化，每一层layer可能在提取不同的feature.
+
+## Convolution layer的维度变换公式
+
+How to determine the dimensions of the output based on the input size and the filter size (shown below). You'll use this to determine what the size of your filter should be.
+
+对于SAME padding，P=1；对于VALID padding，P=0.
+
+new_height = (input_height - filter_height + 2 * P)/S + 1
+
+new_width = (input_width - filter_width + 2 * P)/S + 1
+
+TensorFlow uses the following equation for 'SAME' vs 'VALID'
+
+需要注意的是，对于SAME Padding，最终的convolution layer的长宽与filter的大小无关。
+
+SAME Padding, the output height and width are computed as:
+
+out_height = ceil(float(in_height) / float(strides[1]))
+
+out_width = ceil(float(in_width) / float(strides[2]))
+
+VALID Padding, the output height and width are computed as:
+
+out_height = ceil(float(in_height - filter_height + 1) / float(strides[1]))
+
+out_width = ceil(float(in_width - filter_width + 1) / float(strides[2]))
+
+## Flatten layer
+
+Flatten layer把convolution layer的输出从四维变成二维，第一维依旧是batch size，第二维其实是把convolution layer的后三个维度展开成一个大的向量。
+
+## Fully connected layer
+
+需要选择hidden layer的node number，与普通neural net的input的hidden layer的变化无异。
+
+在实际应用中，fully connected layer也可能有多层。
+
+## Output layer
+
+就是对fully connected layer做一个线性变换。
+
+在tensorflow中，Activation, softmax, or cross entropy should not be applied to this step。softmax和cross entropy是针对output layer的输出进行的，在后面的步骤中进行，而且一般直接使用tensorflow所带的高级函数。
+
 Refercences:
 
 [Deep learning and convolutional neural network](http://neuralnetworksanddeeplearning.com/chap6.html)
