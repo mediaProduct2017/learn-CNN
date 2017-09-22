@@ -16,7 +16,7 @@ Explore data包括展示data某一维的histogram分布，或者是不同维度�
 
 Data normalization包括必要的话取对数并做outlier detection，以及减去均值除以标准差的归一化处理。归一化处理时有可能是以0为均值、以1为标准差的normal，也有可能是truncated normal，同样是以0位均值、以1为标准差，但是2以外的数值就不要了（其实常见于weights的初始化）。如果原始数据就都是正值，也有可能简单除以数据的最大值，或者除以数据可能的最大值，或者除以范围（数据的最大值-最小值）。Data normalization还包括one-hot encode for target variable.
 
-在数据分析的noetbook中，经常设置check point，比如保存好数据后，下一个cell可以设置check point，简单的重新载入数据，如果重新启动可以从这一个cell开始。
+在数据分析的noetbook中，经常设置check point，比如保存好数据后，下一个cell可以设置check point，简单的重新载入数据，如果重新启动可以从这一个cell开始。在训练好model之后，也经常会保存相应的参数，再设置一个check point.
 
 Note: None for shapes in TensorFlow allow for a dynamic size. 也即是说，在TF placeholder中，None在具体传参的时候可以是任意值。
 
@@ -30,9 +30,13 @@ In short, you use tf.Variable for trainable variables such as weights and biases
 
 从input到convolution layer，和普通的neural net的input到hidden layer有神似，普通的neural net的input是把二维或者三维的图片展成一个大的向量，这里，input是把filter的三维input展成一个大的向量，然后通过线性变换对应到convolution layer上，对于一个filter，convolution layer是一个向量，大小是convolution layer的深度，其实相当于普通的neural net的hidden layer，convolution layer的深度就对应着hidden layer的node number.
 
+对于convolution layer，线性变换之后，还要使用relu函数进行activate，比如用tf.nn.relu().
+
 convolution layer从深度的一维到三维的过程，不过是filter在横纵两个维度上依次扫描罢了。在实际的应用中，convolution layer常常输出一个四维的tensor，第一维是batch size，就是用来训练的有多少个batch，接下来的三个维度依次是横纵和深度。
 
 max pooling是一个降低模型复杂度，减少参数的过程，pooling的ksize一般也是四维，第一维batch pooling一般选1，第四维feature pooling一般也选1，只在横纵两个维度上做max pooling。pooling的strides的大小一般和pooling的大小是一致的。
+
+如果数据量很大，可以不用pooling。
 
 Convolution and max pooling layer有可能不只一个，有可能有多个，layer的深度在不断发生变化，每一层layer可能在提取不同的feature.
 
@@ -68,7 +72,7 @@ Flatten layer把convolution layer的输出从四维变成二维，第一维依�
 
 ## Fully connected layer
 
-需要选择hidden layer的node number，与普通neural net的input的hidden layer的变化无异。
+需要选择hidden layer的node number，与普通neural net的input的hidden layer的变化无异，就是线性变换，变换后需要用activation，比如relu activatoin。
 
 在实际应用中，fully connected layer也可能有多层。
 
@@ -77,6 +81,28 @@ Flatten layer把convolution layer的输出从四维变成二维，第一维依�
 就是对fully connected layer做一个线性变换。
 
 在tensorflow中，Activation, softmax, or cross entropy should not be applied to this step。softmax和cross entropy是针对output layer的输出进行的，在后面的步骤中进行，而且一般直接使用tensorflow所带的高级函数。
+
+## Dropout
+
+dropout是防止overfitting的一种办法，随机干掉一定比例的node，在某一个batch的拟合中，减少需要拟合的参数。keep probability参数越小，干掉的node越多，防止overfitting的作用越强。
+
+dropout可以加在max pooling layer之后，也可以加在fully connected layer之后。一种常见的处理是，只加在最后一层fully connected layer之后。
+
+dropout一般0.5左右效果最佳，可以在0.25-0.75之间尝试，如果是简单项目，调的不用那么细，0.5就行了。
+
+For validation test set, use a keep probability of 1.0 to calculate the loss and validation accuracy.
+
+## Hyperparameters
+
+Set epochs to the number of iterations until the network stops learning or start overfitting
+
+Set batch_size to the highest number that your machine has memory for. Most people set them to common sizes of memory. The larger, the better. For example, 256, or 128.
+
+Set keep_probability to the probability of keeping a node using dropout
+
+## Train on a single batch and fully train the model
+
+the number of iterations设好之后，在每一个iteration之下，可以只有一批数据来训练，也可以是多批数据（多个mini batch），常用的一种方法是，先用一批数据，调整其他参数，但accuracy达到一定标准之后，再使用多批数据来训练。
 
 Refercences:
 
