@@ -104,6 +104,10 @@ Set keep_probability to the probability of keeping a node using dropout
 
 the number of iterations设好之后，在每一个iteration之下，可以只有一批数据来训练，也可以是多批数据（多个mini batch），常用的一种方法是，先用一批数据，调整其他参数，但accuracy达到一定标准之后，再使用多批数据来训练。
 
+## CNN for sentence classification
+
+在CNN用于句子（短文本）分类的开山之作（2014年）中，在扫描文本时，作者使用了3个strides，2个不同大小的filter，也就是总共6种扫描策略，得到6个convolutional and max pooling layer，然后把相同strides的两个filter的convolutional and max pooling layer用fully connected network合并成一个hidden layer，这样，总共得到3个hidden layer，然后，再把这3个hidden layer用fully connected network合并成output layer，使用sigmoid或者softmax activation，得到最终的预测。
+
 Refercences:
 
 [Deep learning and convolutional neural network](http://neuralnetworksanddeeplearning.com/chap6.html)
