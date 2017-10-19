@@ -108,7 +108,17 @@ the number of iterations设好之后，在每一个iteration之下，可以只�
 
 在CNN用于句子（短文本）分类的开山之作（2014年）中，在扫描文本时，作者使用了3个strides，2个不同大小的filter，也就是总共6种扫描策略，得到6个convolutional and max pooling layer，然后把相同strides的两个filter的convolutional and max pooling layer用fully connected network合并成一个hidden layer，这样，总共得到3个hidden layer，然后，再把这3个hidden layer用fully connected network合并成output layer，使用sigmoid或者softmax activation，得到最终的预测。
 
-Refercences:
+## training data with many batches
+
+数据分成多个batch有很多好处（要随机来分，不能一个batch中只有一个类），当数据量大的时候，合适大小的batch可以在一次操作中全部装入内存。
+
+在初步训练时，使用多个epoch，但是只用一个batch，这样避免了不断把不同的batch载入内存。当准确率超过一定阈值以后，再在多个batch中训练。
+
+在多个batch上训练时，每一轮的epoch，模型要依次在不同的batch上训练，这样，避免某一个特定的batch把模型的参数引到沟里去，保证多个batch对模型参数持续施加影响。
+
+在training的时候，两个重要的观测值是traing loss (一般就叫做loss)，以及validation accuracy.
+
+## Refercences
 
 [Deep learning and convolutional neural network](http://neuralnetworksanddeeplearning.com/chap6.html)
 
