@@ -40,6 +40,12 @@ max pooling是一个降低模型复杂度，减少参数的过程，pooling的ks
 
 Convolution and max pooling layer有可能不只一个，有可能有多个，layer的深度在不断发生变化，每一层layer可能在提取不同的feature.
 
+## conv net及max pooling的filter、strides大小的选择
+
+对于长宽为20-30的图片，conv filter取5*5是合适的，深度可以取到32，strides取2*2是合适的，在tensorflow中，conv layer的大小和filter大小是无关的，只和原大小以及strides有关。max pooling的filter取2*2，strides也取2*2是合适的，是很常见的设置。
+
+You can read more on convolutional network architectures here: [cs231n](http://cs231n.github.io/convolutional-networks/#architectures) and [stackexchange](http://stats.stackexchange.com/questions/148139/rules-for-selecting-convolutional-neural-network-parameters)
+
 ## Convolution layer的维度变换公式
 
 How to determine the dimensions of the output based on the input size and the filter size (shown below). You'll use this to determine what the size of your filter should be.
@@ -90,13 +96,13 @@ dropout可以加在max pooling layer之后，也可以加在fully connected laye
 
 dropout一般0.5左右效果最佳，可以在0.25-0.75之间尝试，如果是简单项目，调的不用那么细，0.5就行了。
 
-For validation test set, use a keep probability of 1.0 to calculate the loss and validation accuracy.
+For validation test set, use a keep probability of 1.0 to calculate the validation loss (if necessary) and validation accuracy.
 
 ## Hyperparameters
 
 Set epochs to the number of iterations until the network stops learning or start overfitting
 
-Set batch_size to the highest number that your machine has memory for. Most people set them to common sizes of memory. The larger, the better. For example, 256, or 128.
+Set batch_size to the highest number that your machine has memory for. Most people set them to common sizes of memory. The larger, the better. For example, 256, or 128. Usually, 128 is enough.
 
 Set keep_probability to the probability of keeping a node using dropout
 
@@ -117,6 +123,10 @@ the number of iterations设好之后，在每一个iteration之下，可以只�
 在多个batch上训练时，每一轮的epoch，模型要依次在不同的batch上训练，这样，避免某一个特定的batch把模型的参数引到沟里去，保证多个batch对模型参数持续施加影响。
 
 在training的时候，两个重要的观测值是traing loss (一般就叫做loss)，以及validation accuracy.
+
+## 最终test的作用
+
+validation data是要用来调整hyper parameter的，所以validation accuracy并不能代表最终的accuracy. 最终的accuracy是由test data决定的，而且test accuracy要和validation accuracy差不多，如果明显偏小，说明模型出现了过拟合。
 
 ## Refercences
 
