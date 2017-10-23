@@ -42,7 +42,7 @@ Convolution and max pooling layer有可能不只一个，有可能有多个，la
 
 ## conv net及max pooling的filter、strides大小的选择
 
-对于长宽为20-30的图片，conv filter取5*5是合适的，深度可以取到32，strides取2*2是合适的，在tensorflow中，conv layer的大小和filter大小是无关的，只和原大小以及strides有关。max pooling的filter取2*2，strides也取2*2是合适的，是很常见的设置。
+对于长宽为20-30的图片，conv filter取5*5是合适的，深度可以取到32（16、64也值得尝试），strides取2*2是合适的，在tensorflow中，conv layer的大小和filter大小是无关的，只和原大小以及strides有关。max pooling的filter取2*2，strides也取2*2是合适的，是很常见的设置。
 
 You can read more on convolutional network architectures here: [cs231n](http://cs231n.github.io/convolutional-networks/#architectures) and [stackexchange](http://stats.stackexchange.com/questions/148139/rules-for-selecting-convolutional-neural-network-parameters)
 
@@ -81,6 +81,8 @@ Flatten layer把convolution layer的输出从四维变成二维，第一维依�
 需要选择hidden layer的node number，与普通neural net的input的hidden layer的变化无异，就是线性变换，变换后需要用activation，比如relu activatoin。
 
 在实际应用中，fully connected layer也可能有多层。
+
+fully connected layer的node数常选512，2014，2048等（比如1024），一般来说，fully connected layer的node数要比Flatten layer的node数少。
 
 ## Output layer
 
